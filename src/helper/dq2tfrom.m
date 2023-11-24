@@ -1,3 +1,11 @@
+% Copyright 2023 Haowen Yao
+%
+% This file is part of the CoppeliaSim_Franka_ModelFix repository.
+% 
+%     Use of this source code is governed by an MIT-style
+%     license that can be found in the LICENSE file or at
+%     https://opensource.org/licenses/MIT.
+
 function tform = dq2tfrom(dq)
 %DQ2TFROM convert Dual quaternion to homogenous transformation matrix
     tform = zeros(4,4);
