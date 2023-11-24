@@ -1,3 +1,11 @@
+% Copyright 2023 Haowen Yao
+%
+% This file is part of the CoppeliaSim_Franka_ModelFix repository.
+% 
+%     Use of this source code is governed by an MIT-style
+%     license that can be found in the LICENSE file or at
+%     https://opensource.org/licenses/MIT.
+
 classdef FrankaDQ
     %FRANKADQ Franka kinematic implementation with DQ robotics toolbox
     
@@ -71,53 +79,56 @@ classdef FrankaDQ
             end
         end
 
-        % function dq_out = get_relative_joint_pose(obj,config,linkTarget,linkRelative)
-        %     if linkTarget > linkRelative
-        %         if linkTarget>=1 && linkTarget<=7
-        %             config(linkTarget) = 0;
-        %         end
-        % 
-        %         if linkTarget <= 7
-        %             dq_far = obj.rbt.fkm(config,linkTarget);
-        %         else
-        %             dq_far = obj.rbt.fkm(config);
-        %         end
-        %         dq_close = obj.rbt.fkm(config,linkRelative);
-        % 
-        %         dq_out = dq_far * dq_close';
-        % 
-        %     elseif linkTarget < linkRelative
-        %         if linkTarget>=1 && linkTarget<=7
-        %             config(linkTarget) = 0;
-        %         end
-        % 
-        %         dq_close = obj.rbt.fkm(config,linkTarget);
-        %         if linkRelative <= 7
-        %             dq_far = obj.rbt.fkm(config,linkRelative);
-        %         else
-        %             dq_far = obj.rbt.fkm(config);
-        %         end
-        % 
-        %         dq_out = dq_close * dq_far';
-        % 
-        %     else
-        %         if linkTarget <= 7
-        %             dq_far = obj.rbt.fkm(config,linkTarget);
-        %         else
-        %             dq_far = obj.rbt.fkm(config);
-        %         end
-        %         if linkTarget>=1 && linkTarget<=7
-        %             config(linkTarget) = 0;
-        %         end
-        %         if linkTarget <= 7
-        %             dq_close = obj.rbt.fkm(config,linkTarget);
-        %         else
-        %             dq_close = obj.rbt.fkm(config);
-        %         end
-        % 
-        %         dq_out = dq_far * dq_close';
-        %     end
-        % end
+        function dq_out = get_relative_joint_pose(obj,config,linkTarget,linkRelative,includeCurrent)
+            if includeCurrent == false
+                if linkTarget > linkRelative
+                    if linkTarget>=1 && linkTarget<=7
+                        config(linkTarget) = 0;
+                    end
+    
+                    if linkTarget <= 7
+                        dq_far = obj.rbt.fkm(config,linkTarget);
+                    else
+                        dq_far = obj.rbt.fkm(config);
+                    end
+                    dq_close = obj.rbt.fkm(config,linkRelative);
+    
+                    dq_out = dq_close' * dq_far;
+                else
+                    if linkRelative <= 7
+                        dq_far = obj.rbt.fkm(config,linkRelative);
+                    else
+                        dq_far = obj.rbt.fkm(config);
+                    end
+    
+                    if linkTarget>=1 && linkTarget<=7
+                        config(linkTarget) = 0;
+                    end
+    
+                    if linkTarget <= 7
+                        dq_close = obj.rbt.fkm(config,linkTarget);
+                    else
+                        dq_close = obj.rbt.fkm(config);
+                    end
+    
+                    dq_out = dq_far' * dq_close;
+                end
+            else
+                if linkTarget <= 7
+                    dq_tar = obj.rbt.fkm(config,linkTarget);
+                else
+                    dq_tar = obj.rbt.fkm(config);
+                end
+
+                if linkRelative <= 7
+                    dq_rel = obj.rbt.fkm(config,linkRelative);
+                else
+                    dq_rel = obj.rbt.fkm(config);
+                end
+
+                dq_out = dq_rel' * dq_tar;
+            end
+        end
     end
 end
 

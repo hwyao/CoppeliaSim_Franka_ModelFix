@@ -1,5 +1,13 @@
-classdef FrankaVrep
-    %FRANKAVREP 
+% Copyright 2023 Haowen Yao
+%
+% This file is part of the CoppeliaSim_Franka_ModelFix repository.
+% 
+%     Use of this source code is governed by an MIT-style
+%     license that can be found in the LICENSE file or at
+%     https://opensource.org/licenses/MIT.
+
+classdef FrankaVrepDQ
+    %FRANKAVREPDQ Franka kinematic implementation with DQ_VrepInterface
 
     properties
         vrepInterface
@@ -13,7 +21,7 @@ classdef FrankaVrep
     end
     
     methods
-        function obj = FrankaVrep(vi)
+        function obj = FrankaVrepDQ(vi)
             arguments
                 vi DQ_VrepInterface
             end
@@ -40,12 +48,16 @@ classdef FrankaVrep
             end
         end
 
-        % function dq_out = get_relative_joint_pose(obj,config,linkTarget,linkRelative)
-        %     obj.vrepInterface.set_joint_positions(obj.vrepJointName(2:8),config,obj.vrepInterface.OP_BLOCKING);
-        %     % here we follow the VREP definition. So other implementation
-        %     % would be more difficult.
-        %     dq_out = obj.vrepInterface.get_object_pose(obj.vrepJointName{linkTarget+1},obj.vrepJointName{linkRelative+1},obj.vrepInterface.OP_BLOCKING);
-        % end
+        function dq_out = get_relative_joint_pose(obj,config,linkTarget,linkRelative,includeCurrent)
+            obj.vrepInterface.set_joint_positions(obj.vrepJointName(2:8),config,obj.vrepInterface.OP_BLOCKING);
+            if includeCurrent == false
+                dq_out = obj.vrepInterface.get_object_pose(obj.vrepJointName{linkTarget+1},obj.vrepJointName{linkRelative+1},obj.vrepInterface.OP_BLOCKING);
+            else
+                dq_tar = obj.vrepInterface.get_object_pose(obj.vrepJointName{1},obj.vrepJointName{linkTarget+1},obj.vrepInterface.OP_BLOCKING)';
+                dq_rel = obj.vrepInterface.get_object_pose(obj.vrepJointName{1},obj.vrepJointName{linkRelative+1},obj.vrepInterface.OP_BLOCKING)';
+                dq_out = dq_rel' * dq_tar;
+            end
+        end
     end
 
     methods

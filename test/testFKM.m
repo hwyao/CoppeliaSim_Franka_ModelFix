@@ -1,3 +1,11 @@
+% Copyright 2023 Haowen Yao
+%
+% This file is part of the CoppeliaSim_Franka_ModelFix repository.
+% 
+%     Use of this source code is governed by an MIT-style
+%     license that can be found in the LICENSE file or at
+%     https://opensource.org/licenses/MIT.
+
 classdef testFKM < matlab.unittest.TestCase
 
     properties
@@ -24,14 +32,14 @@ classdef testFKM < matlab.unittest.TestCase
         % quickly generate and manage differents test combination with the
         % same test function.
 
-        compareTarget = {'VREP'}
+        compareTarget = {'VREP_DQ','VREP_Raw'}
 
-        compareBaseline = {'Matlab','DQ'} 
+        compareBaseline = {'Matlab','DQ'}
         
         targetFrame = {0, ...
                        1,2,3,4,5,6,7, ...
                        8};
-        
+
         relativeFrame = {0, ...
                          1,2,3,4,5,6,7, ...
                          8};
@@ -125,7 +133,7 @@ classdef testFKM < matlab.unittest.TestCase
             % that angle and still keep the same.
             % If this failed, the joint limit of that model is them
             % problematic. Which might fluence the correctness of later test. 
-            FrankaVrepObj = FrankaVrep(testCase.vi);
+            FrankaVrepObj = FrankaVrepDQ(testCase.vi);
             
             % assert that the vrep robot should least move inside the range of joint limit
             FrankaVrepObj.set_joint(testCase.q_min);
@@ -149,7 +157,7 @@ classdef testFKM < matlab.unittest.TestCase
         end
     end
     
-    methods(Test)
+    methods(Test, ParameterCombination = "pairwise")
         % Test single EE
         function EETest(testCase,compareTarget,compareBaseline,config)
             testCase.assumeEqual(config > testCase.q_min & config < testCase.q_max,true(7,1));
@@ -179,18 +187,18 @@ classdef testFKM < matlab.unittest.TestCase
             testCase.assertEqual(vec8(dq_target),vec8(dq_compare),'AbsTol',testCase.tol);
         end
 
-        % function FrameRelativeTest(testCase,compareTarget,compareBaseline,targetFrame,relativeFrame,config)
-        %     testCase.assumeEqual(config > testCase.q_min & config < testCase.q_max,true(7,1));
-        % 
-        %     FrankaTarget = testCase.kinematicFactory.construct(compareTarget,testCase.vi);
-        %     FrankaCompare = testCase.kinematicFactory.construct(compareBaseline,testCase.vi);
-        % 
-        %     dq_target = FrankaTarget.get_relative_joint_pose(config,targetFrame,relativeFrame);
-        %     dq_compare = FrankaCompare.get_relative_joint_pose(config,targetFrame,relativeFrame);
-        % 
-        %     [dq_compare,dq_target] = dqCompareHelp(dq_compare,dq_target);
-        % 
-        %     testCase.assertEqual(vec8(dq_target),vec8(dq_compare),'AbsTol',testCase.tol);
-        % end
+        function FrameRelativeTest(testCase,compareTarget,compareBaseline,targetFrame,relativeFrame,config,includeCurrent)
+            testCase.assumeEqual(config > testCase.q_min & config < testCase.q_max,true(7,1));
+
+            FrankaTarget = testCase.kinematicFactory.construct(compareTarget,testCase.vi);
+            FrankaCompare = testCase.kinematicFactory.construct(compareBaseline,testCase.vi);
+
+            dq_target = FrankaTarget.get_relative_joint_pose(config,targetFrame,relativeFrame,includeCurrent);
+            dq_compare = FrankaCompare.get_relative_joint_pose(config,targetFrame,relativeFrame,includeCurrent);
+
+            [dq_compare,dq_target] = dqCompareHelp(dq_compare,dq_target);
+
+            testCase.assertEqual(vec8(dq_target),vec8(dq_compare),'AbsTol',testCase.tol);
+        end
     end
 end

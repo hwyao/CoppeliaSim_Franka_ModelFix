@@ -33,26 +33,25 @@ classdef FrankaMatlab < FrankaInterface
             dq_out = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{num+1}));
         end
 
-        % function dq_out = get_relative_joint_pose(obj,config,linkTarget,linkRelative)
-        %     if linkTarget > linkRelative
-        %         if linkTarget>=1 && linkTarget<=7
-        %             config(linkTarget) = 0;
-        %         end
-        %         dq_out = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{linkRelative+1}));
-        %     elseif linkTarget < linkRelative
-        %         if linkRelative>=1 && linkRelative<=7
-        %             config(linkRelative) = 0;
-        %         end
-        %         dq_out = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{linkRelative+1}));
-        %     else
-        %         dq_after = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{linkRelative+1}));
-        %         if linkRelative>=1 && linkRelative<=7
-        %             config(linkRelative) = 0;
-        %         end
-        %         dq_before = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{linkRelative+1}));
-        %         dq_out = dq_after * dq_before';
-        %     end
-        % end
+        function dq_out = get_relative_joint_pose(obj,config,linkTarget,linkRelative,includeCurrent)
+            if includeCurrent == false
+                if linkTarget > linkRelative
+                    if linkTarget>=1 && linkTarget<=7
+                        config(linkTarget) = 0;
+                    end
+                    dq_out = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{linkRelative+1}));
+                else
+                    T_far = obj.rbt.getTransform(config,obj.allJointName{linkRelative+1},obj.allJointName{1});
+                    if linkTarget>=1 && linkTarget<=7
+                        config(linkTarget) = 0;
+                    end
+                    T_close = obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{1});
+                    dq_out = tfrom2dq(T_far \ T_close);
+                end
+            else
+                dq_out = tfrom2dq(obj.rbt.getTransform(config,obj.allJointName{linkTarget+1},obj.allJointName{linkRelative+1}));
+            end
+        end
     end
 end
 
