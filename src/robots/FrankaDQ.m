@@ -40,7 +40,7 @@ classdef FrankaDQ
             % the 5th row of DH table and removes the convention parameter here. 
             % The current (20.04.0.1) toolbox does not update this feature. 
             % Therefore we keep the old style here.
-            % Notice, Franka have 'modified' (distal) DH_parameter here in official document
+            % Notice, Franka have 'modified' (proximal) DH_parameter here in official document
             % According to commit 279e276, the future update: 
             % does not allow a direct 'DQ_SerialManipulator(A,convention)' construction (Marked as Abstract Now)
             % https://github.com/dqrobotics/matlab/commit/279e276062d4e8ea5c7f11ebac57920c54182404#diff-fafd7e51692a6bd684f91e4bd95c4a822de6299df9b6f3ceba427af4391c30bbR80
@@ -48,7 +48,7 @@ classdef FrankaDQ
             % https://github.com/dqrobotics/matlab/commit/279e276062d4e8ea5c7f11ebac57920c54182404#diff-c3128d4a1bec4850fe5a40d183b08d1fb6c93e9d3a1fe1268311e6dacdabc07aR175
             % 
             % Notice if your toolbox is higher and updates the feature here.
-            obj.rbt = DQ_SerialManipulator(DH_matrix,'modified'); % actually any kind word other than "standard" works
+            obj.rbt = DQ_SerialManipulator(DH_matrix,'modified'); % actually any word other than "standard" works
             % kin = DQ_SerialManipulatorMDH(DH_matrix);
 
             % Set the base's reference frame

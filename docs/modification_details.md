@@ -15,9 +15,9 @@ Also, the process of acquiring the relative frame is not very intuitive, which m
 
 There may be a problem when attempting to obtain the pose of a joint directly from the simulator using the CoppeliaSim remote API. Please note that this issue has only been verified with MATLAB. The API for other programming languages is unverified.
 
-For example, when you use DQ robotics toolbox, you assign the robot kinematic DH on your own, which is normally copied from the [official Website](https://frankaemika.github.io/docs/control_parameters.html#denavithartenberg-parameters). Therefore, when using function like `fkm(q,1)` or that directly calculate from you DH input, the result is correct. Matlab function `getTransform(rbt,q,'panda_link1')` also outputs the same result.
+For example, when you use DQ robotics toolbox, you assign the robot kinematic DH on your own, which is normally copied from the [official Website](https://frankaemika.github.io/docs/control_parameters.html#denavithartenberg-parameters). Therefore, when using function like `fkm(q,1)` that directly calculate from you DH input, the result is correct. Matlab function `getTransform(rbt,q,'panda_link1')` also outputs the same result.
 
-However, if you suddenly decide to read the joint position from the `DQ_VrepInterface`. For example calling `get_object_position('Franka/Franka_joint1')`, the result would then be inconsistent.
+However, if you suddenly decide to read the joint position from the `DQ_VrepInterface`. For example calling `get_object_position('Franka/Franka_joint1')`, the result would then be inconsistent. The raw api function provided in `remApi.m` provides the same result.
 
 ![The result is different because the joint position does not match](./img/jointUnmatch.png)
 
